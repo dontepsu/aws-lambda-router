@@ -1,0 +1,13 @@
+{
+  "extends": ["tslint-react", "tslint-config-semistandard"],
+  "rules": {
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never",
+        "esSpecCompliant": true
+      }
+    ]
+  }
+}
