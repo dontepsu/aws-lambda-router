@@ -20,9 +20,9 @@ export interface Routes {
 
 export interface RouterConfig {
   prefix?: string;
-  headers?: {},
-  onInvoke? <T>(event: APIGatewayProxyEvent, context: Context): Promise<T>;
-  onError? (error: Boom.Boom): void;
+  headers?: {};
+  onInvoke? <T> (event: APIGatewayProxyEvent, context: Context): Promise<T>;
+  onError? (error: Boom.Boom): Promise<void>;
 }
 export interface RouteConfig<T = any> extends RouteOptions {
   method: SupportedHttpVerb;
@@ -36,6 +36,6 @@ export interface RouteOptions {
   cache?: {
     cacheType: CacheType[];
     age: number;
-  },
-  headers?: {},
+  };
+  headers?: {};
 }

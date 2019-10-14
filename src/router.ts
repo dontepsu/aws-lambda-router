@@ -3,7 +3,6 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler, Co
 import { CacheType, SupportedHttpVerb, ErrorDeclaration, RouteHandler, Routes, RouterConfig, RouteConfig, RouteOptions } from './types';
 import { defaultErrorDeclaration } from './defaults';
 
-
 export class Router {
   private routes: Routes = {};
 
@@ -30,12 +29,12 @@ export class Router {
           await this.config.onInvoke(event, context);
         }
         const resp = await route.handler(event, context);
-        
+
         return this.createResponse(route, resp);
       } catch (error) {
         return this.handleError(route.errors || [])(error);
       }
-    }
+    };
   }
 
   route (config: RouteConfig): void {
@@ -56,7 +55,7 @@ export class Router {
   }
 
   private getRoute (path: string, method: SupportedHttpVerb): RouteConfig {
-    if (!this.routes[path] || !this.routes[path][method]) {
+    if (!this.routes[path] || !this.routes[path][method]) {
       throw Boom.internal('Route not found');
     }
 
@@ -71,7 +70,7 @@ export class Router {
       }
       return cacheHeader;
     });
-  
+
     headers['cache-control'] = cacheHeaders.join(', ');
 
     return headers;
@@ -114,9 +113,9 @@ export class Router {
           return err.name === e.type || e.message === e.type;
         }) || defaultErrorDeclaration;
 
-        err =  Boom.boomify(err, { statusCode: errorDeclaration.statusCode, message: errorDeclaration.message });
+        err = Boom.boomify(err, { statusCode: errorDeclaration.statusCode, message: errorDeclaration.message });
       }
-    
+
       if (this.config.onError) {
         try {
           await this.config.onError(err);
@@ -125,7 +124,6 @@ export class Router {
         }
       }
 
-  
       return {
         statusCode: err.statusCode,
         body: JSON.stringify(err.toString()),

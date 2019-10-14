@@ -1,6 +1,6 @@
 {
   "name": "aws-lambda-router",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Simple API router for AWS lambda and Serverless framework built with TypeScript",
   "main": "lib/index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "clean": "rm -rf ./lib",
     "test": "jest",
     "test:tdd": "jest --watch",
-    "tslint": "tslint --project ."
+    "lint": "tslint --project .",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import { ErrorDeclaration, } from './types';
+import { ErrorDeclaration } from './types';
 
 export const defaultErrorDeclaration: ErrorDeclaration = {
   statusCode: 500,
