@@ -1,6 +1,6 @@
 {
   "name": "@dontepsu/aws-lambda-router",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple API router for AWS lambda and Serverless framework built with TypeScript",
   "main": "lib/index.js",
   "scripts": {
