@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import Boom from '@hapi/boom';
 
-export type RouteHandler<T> = (event: APIGatewayProxyEvent, context: Context) => Promise<T>;
+export type RouteHandler<T> = (event: APIGatewayProxyEvent, context?: Context) => Promise<T>;
 export type SupportedHttpVerb = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export type CacheType = 'must-revalidate' | 'no-cache' | 'no-store' | 'no-transform' |
   'public' | 'private' | 'proxy-revalidate' | 'max-age' | 's-maxage';
