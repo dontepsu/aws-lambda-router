@@ -8,7 +8,7 @@ export class Router {
 
   constructor (private config: RouterConfig = {}) {}
 
-  handler (): APIGatewayProxyHandler {
+  get handler (): APIGatewayProxyHandler {
     return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
       context.callbackWaitsForEmptyEventLoop = false;
       let route: RouteConfig;
@@ -50,6 +50,42 @@ export class Router {
       path,
       handler,
       method: 'GET',
+      ...options,
+    });
+  }
+
+  post<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
+    this.route({
+      path,
+      handler,
+      method: 'POST',
+      ...options,
+    });
+  }
+
+  put<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
+    this.route({
+      path,
+      handler,
+      method: 'PUT',
+      ...options,
+    });
+  }
+
+  delete<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
+    this.route({
+      path,
+      handler,
+      method: 'DELETE',
+      ...options,
+    });
+  }
+
+  patch<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
+    this.route({
+      path,
+      handler,
+      method: 'PATCH',
       ...options,
     });
   }
