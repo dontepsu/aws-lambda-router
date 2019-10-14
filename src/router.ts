@@ -1,4 +1,4 @@
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler, Context } from 'aws-lambda';
 import { CacheType, SupportedHttpVerb, ErrorDeclaration, RouteHandler, Routes, RouterConfig, RouteConfig, RouteOptions } from './types';
 import { defaultErrorDeclaration } from './defaults';
