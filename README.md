@@ -1,7 +1,7 @@
 # AWS Lambda Router
 A simple router for AWS Lambda functions and Serverless framework built with TypeScript.
 
-## Usage
+## Basic Usage
 ```
 import { Router } from '@dontepsu/aws-lambda-router';
 
@@ -14,3 +14,22 @@ router.route({
   };
 });
 ```
+
+## Concat Routers
+```
+import { Router } from '@dontepsu/aws-lambda-router';
+
+const usersRouter = new Router('/car');
+usersRouter.get('/{id}', event => getCar(event.pathParameters.id))
+
+const todoRouter = new Router('/todo');
+todoRouter.post('', event => addTodo(JSON.parse(event.body)))
+
+const router = new Router();
+router
+  .concat(usersRouter)
+  .concat(todoRouter);
+```
+
+## Error handling
+Documentation to do. You can use Boom errors or errorDeclartion for routes. See code.

@@ -1,48 +1,60 @@
 import * as Boom from '@hapi/boom';
-import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler, Context } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { CacheType, SupportedHttpVerb, ErrorDeclaration, RouteHandler, Routes, RouterConfig, RouteConfig, RouteOptions } from './types';
 import { defaultErrorDeclaration } from './defaults';
 
 export class Router {
   private routes: Routes = {};
+  private prefix = '';
 
-  constructor (private config: RouterConfig = {}) {}
+  constructor (private config: RouterConfig = {}) {
+    if (config.prefix) {
+      this.prefix = config.prefix;
+    }
+  }
 
-  get handler (): APIGatewayProxyHandler {
-    return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-      context.callbackWaitsForEmptyEventLoop = false;
-      let route: RouteConfig;
-      try {
-        route = this.getRoute(event.path, event.httpMethod as SupportedHttpVerb);
-      } catch (error) {
-        return {
-          statusCode: error.statusCode,
-          body: JSON.stringify(error.toString()),
-          headers: {
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Credentials' : true,
-          },
-        };
+  handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+    context.callbackWaitsForEmptyEventLoop = false;
+    let route: RouteConfig;
+    try {
+      route = this.getRoute(event.path, event.httpMethod as SupportedHttpVerb);
+    } catch (error) {
+      return {
+        statusCode: error.statusCode,
+        body: JSON.stringify(error.toString()),
+        headers: {
+          'Access-Control-Allow-Origin' : '*',
+          'Access-Control-Allow-Credentials' : true,
+        },
+      };
+    }
+    try {
+      if (this.config.onInvoke) {
+        await this.config.onInvoke(event, context);
       }
-      try {
-        if (this.config.onInvoke) {
-          await this.config.onInvoke(event, context);
-        }
-        const resp = await route.handler(event, context);
+      const resp = await route.handler(event, context);
 
-        return this.createResponse(route, resp);
-      } catch (error) {
-        return this.handleError(route.errors || [])(error);
-      }
+      return this.createResponse(route, resp);
+    } catch (error) {
+      return this.handleError(route.errors || [])(error);
+    }
+  }
+
+  concat (router: Router) {
+    this.routes = {
+      ...this.routes,
+      ...router.routes,
     };
   }
 
   route (config: RouteConfig): void {
-    if (!this.routes[config.path]) {
+    const path = `${this.prefix}${config.path}`;
+
+    if (!this.routes[path]) {
       this.routes[config.path] = {};
     }
 
-    this.routes[config.path][config.method] = config;
+    this.routes[path][config.method] = { ...config, path };
   }
 
   get<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
