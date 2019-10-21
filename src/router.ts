@@ -1,59 +1,48 @@
 import * as Boom from '@hapi/boom';
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler, Context } from 'aws-lambda';
 import { CacheType, SupportedHttpVerb, ErrorDeclaration, RouteHandler, Routes, RouterConfig, RouteConfig, RouteOptions } from './types';
 import { defaultErrorDeclaration } from './defaults';
 
 export class Router {
-  protected routes: Routes = {};
-  private prefix = '';
+  private routes: Routes = {};
 
-  constructor (private config: RouterConfig = {}) {
-    if (config.prefix) this.prefix = config.prefix;
-  }
+  constructor (private config: RouterConfig = {}) {}
 
-  handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    context.callbackWaitsForEmptyEventLoop = false;
-    let route: RouteConfig;
-    try {
-      route = this.getRoute(event.resource, event.httpMethod as SupportedHttpVerb);
-    } catch (error) {
-      return {
-        statusCode: error.statusCode,
-        body: JSON.stringify(error.toString()),
-        headers: {
-          'Access-Control-Allow-Origin' : '*',
-          'Access-Control-Allow-Credentials' : true,
-        },
-      };
-    }
-    try {
-      if (this.config.onInvoke) {
-        await this.config.onInvoke(event, context);
+  get handler (): APIGatewayProxyHandler {
+    return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+      context.callbackWaitsForEmptyEventLoop = false;
+      let route: RouteConfig;
+      try {
+        route = this.getRoute(event.path, event.httpMethod as SupportedHttpVerb);
+      } catch (error) {
+        return {
+          statusCode: error.statusCode,
+          body: JSON.stringify(error.toString()),
+          headers: {
+            'Access-Control-Allow-Origin' : '*',
+            'Access-Control-Allow-Credentials' : true,
+          },
+        };
       }
-      const resp = await route.handler(event, context);
+      try {
+        if (this.config.onInvoke) {
+          await this.config.onInvoke(event, context);
+        }
+        const resp = await route.handler(event, context);
 
-      return this.createResponse(route, resp);
-    } catch (error) {
-      return this.handleError(route.errors || [])(error);
-    }
-  }
-
-  concat (router: Router) {
-    this.routes = {
-      ...this.routes,
-      ...router.routes,
+        return this.createResponse(route, resp);
+      } catch (error) {
+        return this.handleError(route.errors || [])(error);
+      }
     };
-
-    return this;
   }
 
   route (config: RouteConfig): void {
-    const path = `${this.prefix}${config.path}`;
-    if (!this.routes[path]) {
-      this.routes[path] = {};
+    if (!this.routes[config.path]) {
+      this.routes[config.path] = {};
     }
 
-    this.routes[path][config.method] = { ...config, path };
+    this.routes[config.path][config.method] = config;
   }
 
   get<T> (path: string, handler: RouteHandler<T>, options: RouteOptions = {}): void {
@@ -172,11 +161,12 @@ export class Router {
       }
 
       return {
-        statusCode: err.statusCode,
-        body: JSON.stringify(err.toString()),
+        statusCode: err.output.statusCode || 500,
+        body: JSON.stringify(err.output.payload),
         headers: {
           'Access-Control-Allow-Origin' : '*',
           'Access-Control-Allow-Credentials' : true,
+          ...(err.output.headers || {}),
         },
       };
     };
