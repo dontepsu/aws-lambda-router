@@ -45,6 +45,8 @@ export class Router {
       ...this.routes,
       ...router.routes,
     };
+
+    return this;
   }
 
   route (config: RouteConfig): void {
