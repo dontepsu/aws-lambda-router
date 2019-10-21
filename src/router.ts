@@ -53,7 +53,7 @@ export class Router {
     const path = `${this.prefix}${config.path}`;
 
     if (!this.routes[path]) {
-      this.routes[config.path] = {};
+      this.routes[path] = {};
     }
 
     this.routes[path][config.method] = { ...config, path };
