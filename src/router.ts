@@ -17,7 +17,7 @@ export class Router {
     context.callbackWaitsForEmptyEventLoop = false;
     let route: RouteConfig;
     try {
-      route = this.getRoute(event.path, event.httpMethod as SupportedHttpVerb);
+      route = this.getRoute(event.resource, event.httpMethod as SupportedHttpVerb);
     } catch (error) {
       return {
         statusCode: error.statusCode,
