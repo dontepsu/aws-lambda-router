@@ -41,10 +41,11 @@ export class Router {
   }
 
   concat (router: Router) {
-    this.routes = {
-      ...this.routes,
-      ...router.routes,
-    };
+    for (let path in router.routes) {
+      for (let method in router.routes[path]) {
+        this.route(router.routes[path][method]);
+      }
+    }
 
     return this;
   }
