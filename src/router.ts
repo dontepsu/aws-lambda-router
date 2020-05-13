@@ -149,7 +149,7 @@ export class Router {
       console.log(JSON.stringify(err.stack));
 
       if (Boom.isBoom(err)) {
-        if (err.data.onError) {
+        if (err.data && err.data.onError) {
           try {
             await err.data.onError();
           } catch (e) {
