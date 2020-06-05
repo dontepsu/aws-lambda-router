@@ -1,7 +1,11 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import * as Boom from '@hapi/boom';
 
-export type RouteHandler<T> = (event: APIGatewayProxyEvent, context?: Context) => Promise<T>;
+export type RouteHandler<Response = any, AppContext = any> = (
+  event?: APIGatewayProxyEvent,
+  apiGWContext?: Context,
+  context?: AppContext,
+) => Promise<Response>;
 export type SupportedHttpVerb = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export type CacheType = 'must-revalidate' | 'no-cache' | 'no-store' | 'no-transform' |
   'public' | 'private' | 'proxy-revalidate' | 'max-age' | 's-maxage';
@@ -21,13 +25,14 @@ export interface Routes {
 export interface RouterConfig {
   prefix?: string;
   headers?: {};
-  onInvoke? <T> (event: APIGatewayProxyEvent, context: Context): Promise<T>;
+  onInvoke? (event?: APIGatewayProxyEvent, context?: Context): Promise<any>;
   onError? (error: Boom.Boom): Promise<void>;
+  context? (event?: APIGatewayProxyEvent, context?: Context): Promise<any>;
 }
-export interface RouteConfig<T = any> extends RouteOptions {
+export interface RouteConfig<Response = any, AppContext = any> extends RouteOptions {
   method: SupportedHttpVerb;
   path: string;
-  handler: RouteHandler<T>;
+  handler: RouteHandler<Response, AppContext>;
 }
 
 export interface RouteOptions {

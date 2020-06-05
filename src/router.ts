@@ -6,11 +6,18 @@ import { defaultErrorDeclaration } from './defaults';
 export class Router {
   private routes: Routes = {};
   private prefix = '';
+  protected parent: Router;
 
   constructor (private config: RouterConfig = {}) {
     if (config.prefix) {
       this.prefix = config.prefix;
     }
+
+    if (!config.context) {
+      this.config.context = async () => ({});
+    }
+
+    this.runContext.bind(this);
   }
 
   handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
@@ -32,7 +39,8 @@ export class Router {
       if (this.config.onInvoke) {
         await this.config.onInvoke(event, context);
       }
-      const resp = await route.handler(event, context);
+      const appContext = await this.runContext(event, context);
+      const resp = await route.handler(event, context, appContext);
 
       return this.createResponse(route, resp);
     } catch (error) {
@@ -41,6 +49,7 @@ export class Router {
   }
 
   concat (router: Router) {
+    router.parent = this;
     for (let path in router.routes) {
       for (let method in router.routes[path]) {
         this.route(router.routes[path][method]);
@@ -103,6 +112,17 @@ export class Router {
       method: 'PATCH',
       ...options,
     });
+  }
+
+  protected async runContext (event: APIGatewayProxyEvent, context: Context): Promise<any> {
+    const parentContextValue = this.parent && (await this.parent.runContext(event, context));
+    const value = await (this.config.context as any)(event, context);
+
+    return {
+      ...value,
+      ...parentContextValue,
+    };
+
   }
 
   private getRoute (path: string, method: SupportedHttpVerb): RouteConfig {

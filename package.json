@@ -1,6 +1,6 @@
 {
   "name": "@dontepsu/aws-lambda-router",
-  "version": "0.1.11",
+  "version": "1.0.0-beta.0",
   "description": "Simple API router for AWS lambda and Serverless framework built with TypeScript",
   "main": "lib/index.js",
   "scripts": {
@@ -8,8 +8,8 @@
     "build:watch": "tsc --watch",
     "prepare": "npm run build",
     "clean": "rm -rf ./lib",
-    "test": "jest",
-    "test:tdd": "jest --watch",
+    "test": "jest --detectOpenHandles",
+    "test:tdd": "jest --detectOpenHandles --watch",
     "lint": "tslint --project .",
     "prepublish": "npm run build"
   },
@@ -37,5 +37,23 @@
     "typescript": "^3.6.3",
     "tslint": "^5.18.0",
     "tslint-config-semistandard": "^8.0.1"
+  },
+  "jest": {
+    "testURL": "http://localhost/",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "\\/src/.*\\.spec\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "modulePaths": [
+      "<rootDir>/src/"
+    ]
   }
 }
