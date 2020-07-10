@@ -28,6 +28,14 @@ export class Router {
         },
       };
     }
+
+    // if the event body is base64 encoded and not-empty,
+    // decode it before forwarding it to the handler
+    if (event.isBase64Encoded && event.body) {
+      event.body = Buffer.from(event.body, 'base64').toString('utf-8');
+      event.isBase64Encoded = false;
+    }
+
     try {
       if (this.config.onInvoke) {
         await this.config.onInvoke(event, context);
