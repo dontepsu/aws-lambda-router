@@ -1,6 +1,6 @@
 {
   "name": "@dontepsu/aws-lambda-router",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "Simple API router for AWS lambda and Serverless framework built with TypeScript",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "test": "jest --detectOpenHandles",
     "test:tdd": "jest --detectOpenHandles --watch",
     "lint": "tslint --project .",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "publish:beta": "npm publish --tag beta"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,7 @@
   },
   "homepage": "https://github.com/dontepsu/aws-lambda-router#readme",
   "dependencies": {
-    "@hapi/boom": "^8.0.1",
-    "typescript": "^3.6.4"
+    "@hapi/boom": "^8.0.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.27",
@@ -34,7 +34,7 @@
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.6.3",
+    "typescript": "^3.9.3",
     "tslint": "^5.18.0",
     "tslint-config-semistandard": "^8.0.1"
   },

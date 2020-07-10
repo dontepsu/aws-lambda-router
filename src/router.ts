@@ -115,14 +115,9 @@ export class Router {
   }
 
   protected async runContext (event: APIGatewayProxyEvent, context: Context): Promise<any> {
-    const parentContextValue = this.parent && (await this.parent.runContext(event, context));
     const value = await (this.config.context as any)(event, context);
 
-    return {
-      ...value,
-      ...parentContextValue,
-    };
-
+    return value;
   }
 
   private getRoute (path: string, method: SupportedHttpVerb): RouteConfig {
